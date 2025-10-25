@@ -6,6 +6,7 @@ const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
 var temp = new Rectangle(20, 20, 50, 50, "red");
+var createRects = new CreateRectangle("blue");
 
 function drawRectangle(rect){
     ctx.fillStyle = rect.color;
@@ -23,7 +24,23 @@ function Update(){
 }
 
 function Draw(){
-    drawRectangle(temp);
+    //drawRectangle(temp);
+    createRects.draw();
+}
+
+function MouseDown(event){
+    createRects.startCreatingRect(event.clientX, event.clientY);
+}
+
+function MouseMove(){
+    createRects.continueCreatingRect(event.clientX, event.clientY);
+}
+
+function MouseUp(){
+    createRects.stopCreatingRect(event.clientX, event.clientY);
 }
 
 setInterval(Update, 16);
+window.addEventListener('mousedown', MouseDown);
+window.addEventListener('mousemove', MouseMove);
+window.addEventListener('mouseup', MouseUp);
