@@ -2,11 +2,14 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext('2d');
 
 var backgroundColor = "black";
+var rectStartColor = "blue";
+
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
-var temp = new Rectangle(20, 20, 50, 50, "red");
-var createRects = new CreateRectangle("blue");
+var createRects = new CreateRectangle(rectStartColor);
+
+var currentTime = 0;
 
 function drawRectangle(rect){
     ctx.fillStyle = rect.color;
@@ -24,7 +27,6 @@ function Update(){
 }
 
 function Draw(){
-    //drawRectangle(temp);
     createRects.draw();
 }
 

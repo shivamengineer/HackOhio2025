@@ -1,12 +1,15 @@
 class CreateRectangle {
 
-    existingRects = [];
+    //existingRects = [];
     creationRect;
+    keyframeDictionary;
 
     startX;
     startY;
 
     selectedColor;
+
+    currentTime;
 
     creatingRect = false;
 
@@ -16,6 +19,10 @@ class CreateRectangle {
 
     changeColor(color){
         this.selectedColor = color;
+    }
+
+    changeTime(time){
+        this.currentTime = time;
     }
 
     startCreatingRect(x, y){
@@ -46,14 +53,15 @@ class CreateRectangle {
 
     stopCreatingRect(x, y){
         this.continueCreatingRect(x, y);
-        this.existingRects.push(this.creationRect);
+        //this.existingRects.push(this.creationRect);
         this.creatingRect = false;
+        return this.creationRect;
     }
 
     draw(){
-        this.existingRects.forEach(rect => {
+        /*this.existingRects.forEach(rect => {
             rect.draw();
-        });
+        });*/
         if(this.creatingRect){
             this.creationRect.draw();
         }
