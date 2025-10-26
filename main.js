@@ -22,6 +22,7 @@ var moveRects = new MoveRectangle();
 var keyframeDictionaries = [];
 
 var currentTime = 0;
+var selected = -1;
 
 function drawRectangle(rect){
     ctx.fillStyle = rect.color;
@@ -38,52 +39,11 @@ function Update(){
     Draw();
 }
 
-function Draw(){
-    createRects.draw();
-    for(i = 0; i < keyframeDictionaries.length; i++){
-        keyframeDictionaries[i].draw(currentTime);
-    }
-}
-
-function selectRect(x, y){
-    var found = false;
-    var i;
-    for(i = 0; !found && i < keyframeDictionaries.length; i++){
-        var rectAtTime = keyframeDictionaries[i].getRectAtTime(currentTime);
-        if(rectAtTime.pointCollides(x, y)){
-            found = true;
-            moveRects.startMovingRect(x, y, rectAtTime);
-            console.log("collides");
-        }
-    }
-
-}
-
-function MouseDown(event){
-    if(currentMode == modes.ADD) createRects.startCreatingRect(event.clientX, event.clientY);
-    if(currentMode == modes.MOVE) selectRect(event.clientX, event.clientY);
-}
-
-function MouseMove(event){
-    if(currentMode == modes.ADD) createRects.continueCreatingRect(event.clientX, event.clientY);
-    if(currentMode == modes.MOVE) moveRects.continueMovingRect(event.clientX, event.clientY);
-}
-
-function MouseUp(event){
-    if(currentMode == modes.ADD){
-        var rect = createRects.stopCreatingRect(event.clientX, event.clientY);
-        var dictionary = new RectangleKeyframeDictionary(id);
-        id++;
-        dictionary.addKeyframe(rect, currentTime);
-        keyframeDictionaries.push(dictionary);
-    }
-    if(currentMode == modes.MOVE) moveRects.stopMovingRect(event.clientX, event.clientY);
-}
-
 function OnKeyDown(event){
     switch(event.keyCode){
         case 65:
-            currentTime--;
+            if(currentTime > 0)
+              currentTime--;
             console.log("time = " + currentTime);
             break;
         case 68:
@@ -100,6 +60,59 @@ function OnKeyDown(event){
             break;
     }
     createRects.changeTime(currentTime);
+}
+
+function Draw(){
+    createRects.draw();
+    for(i = 0; i < keyframeDictionaries.length; i++){
+        keyframeDictionaries[i].draw(currentTime);
+    }
+}
+
+function selectRect(x, y){
+    var found = false;
+    console.log("framedictionary.len " + keyframeDictionaries.length);
+    for(i = 0; !found && i < keyframeDictionaries.length; i++){
+        var rectAtTime = keyframeDictionaries[i].getRectAtTime(currentTime);
+        console.log("rectAtTime" + rectAtTime);
+        if(rectAtTime.pointCollides(x, y)){
+            var newRect = new Rectangle(rectAtTime.x, rectAtTime.y, rectAtTime.width, rectAtTime.height, rectAtTime.color);
+            found = true;
+            selected = i;
+            moveRects.startMovingRect(x, y, newRect);
+            console.log("collides");
+        }
+        console.log("x: " + x + ", y: " + y);
+    }
+
+}
+
+function MouseDown(event){
+    if(currentMode == modes.ADD) createRects.startCreatingRect(event.clientX, event.clientY);
+    if(currentMode == modes.MOVE){
+        selectRect(event.clientX, event.clientY);
+    }
+}
+
+function MouseMove(event){
+    if(currentMode == modes.ADD) createRects.continueCreatingRect(event.clientX, event.clientY);
+    if(currentMode == modes.MOVE) moveRects.continueMovingRect(event.clientX, event.clientY);
+}
+
+function MouseUp(event){
+    if(currentMode == modes.ADD){
+        var rect = createRects.stopCreatingRect(event.clientX, event.clientY);
+        var dictionary = new RectangleKeyframeDictionary(id);
+        id++;
+        dictionary.addKeyframe(rect, currentTime);
+        keyframeDictionaries.push(dictionary);
+    }
+    if(currentMode == modes.MOVE){
+        var rect = moveRects.stopMovingRect(event.clientX, event.clientY);
+        if(rect != null){
+            keyframeDictionaries[selected].addKeyframe(rect, currentTime);
+        }
+    }
 }
 
 setInterval(Update, 16);
